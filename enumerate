@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+# Author: Gilberto Agostinho <gilbertohasnofb@gmail.com>
+# https://github.com/gilbertohasnofb/enumerate
+
+"""enumerate
+
+A Python script which batch renames files in ascending numeric order.
+Accepts single or multiple filenames as well as wildcards.
+If an output filename is given, it's used as a prefix for the resulting files.
+If a number of digits is given, it will print any number with fewer digits than
+that with leading zeroes.
+For help, use:
+$ enumerate --help
+"""
+
+__version__ = '0.1.0'
+
+
+import argparse
+import os
+
+
+def parse_arguments() -> argparse.Namespace:
+    """Parsing command line arguments using argparse. Returns an
+    argparse.Namespace object.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input',
+                        type=str,
+                        nargs='*',
+                        help='input filename(s); also accepts wildcards',
+                        )
+    parser.add_argument('-o', '--output',
+                        required=False,
+                        type=str,
+                        default=None,
+                        help='sets the output filename',
+                        )
+    parser.add_argument('-d', '--digits',
+                        required=False,
+                        type=int,
+                        default=1,
+                        help='minimum amount of digits, adds leading zeroes',
+                        )
+    parser.add_argument('-v', '--version',
+                        action='version',
+                        version='%(prog)s ' + __version__
+                        )
+    return parser.parse_args()
+
+
+def enumerator_loop(args: argparse.Namespace):
+    """Main program loop. Takes the parsed output from parse_arguments() and
+    renames the files in ascending order, using the output prefix if one is
+    given by the user.
+    """
+    counter = 1
+
+    for input_file in args.input:
+
+        # skipping directories
+        if os.path.isdir(input_file):
+            continue
+
+        # parsing input filename
+        input_list = input_file.split('.')
+        if len(input_list) > 1:
+            input_prefix = '.'.join(input_list[:-1])
+            input_extension = '.' + input_list[-1]
+        else:
+            input_prefix = input_list[0]
+            input_extension = ''
+
+        # parsing output filename
+        if args.output:
+            output_list = args.output.split('.')
+            if len(output_list) > 1:
+                output_prefix = '.'.join(output_list[:-1]) + '-'
+                output_extension = '.' + output_list[-1]
+            else:
+                output_prefix = output_list[0] + '-'
+                output_extension = input_extension
+        else:
+            output_prefix = ''
+            output_extension = input_extension
+
+        output_file = output_prefix + str(counter).zfill(args.digits) + \
+            output_extension
+
+        # renaming
+        os.rename(input_file, output_file)
+        counter += 1
+
+    return None
+
+
+def main():
+    args = parse_arguments()
+    enumerator_loop(args)
+    return None
+
+
+if __name__ == '__main__':
+    main()
