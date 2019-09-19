@@ -84,11 +84,17 @@ def enumerator_loop(args: argparse.Namespace):
             output_prefix = ''
             output_extension = input_extension
 
-        output_file = output_prefix + str(counter).zfill(args.digits) + \
-            output_extension
+        while True:
+            output_file = output_prefix + str(counter).zfill(args.digits) + \
+                output_extension
+            if not os.path.exists(output_file) or input_file == output_file:
+                break
+            counter += 1
 
         # renaming
-        os.rename(input_file, output_file)
+        if input_file != output_file:
+            os.rename(input_file, output_file)
+
         counter += 1
 
     return None
