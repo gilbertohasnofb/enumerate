@@ -8,5 +8,4 @@ $ enumerate --help
 
 Bugs can be reported to https://github.com/gilbertohasnofb/enumerate/issues.
 
-This library is published under the MIT License.
-
+This script is published under the MIT License.
